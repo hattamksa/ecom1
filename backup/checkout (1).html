@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - E-Commerce Shop</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: #f5f5f5;
+        }
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .footer {
+            background-color: #2c3e50;
+            color: white;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+    <!-- Header (Sticky) -->
+    <header class="sticky-header bg-white p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-blue-600">E-Commerce Shop</h1>
+            <a href="index.html" class="text-blue-500 hover:text-blue-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto p-4">
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-2xl font-semibold mb-4">Checkout</h2>
+            
+            <div class="mb-8">
+                <h3 class="text-lg font-medium mb-3">Detail Pesanan</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white">
+                        <thead>
+                            <tr>
+                                <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Produk</th>
+                                <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Harga</th>
+                                <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Jumlah</th>
+                                <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="checkout-items">
+                            <!-- Item rows will be inserted here by JavaScript -->
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3" class="py-2 px-4 text-right font-semibold">Subtotal:</td>
+                                <td class="py-2 px-4 font-semibold" id="subtotal">Rp 0</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="py-2 px-4 text-right font-semibold">Pajak (10%):</td>
+                                <td class="py-2 px-4 font-semibold" id="tax">Rp 0</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="py-2 px-4 text-right font-semibold">Total:</td>
+                                <td class="py-2 px-4 font-bold text-lg text-blue-600" id="total">Rp 0</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="text-lg font-medium mb-3">Informasi Pengiriman</h3>
+                    <form>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="name">
+                                Nama Lengkap
+                            </label>
+                            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="name" type="text" placeholder="Nama Lengkap">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="email">
+                                Email
+                            </label>
+                            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="email" type="email" placeholder="Email">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="phone">
+                                Nomor Telepon
+                            </label>
+                            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="phone" type="tel" placeholder="Nomor Telepon">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="address">
+                                Alamat
+                            </label>
+                            <textarea class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="address" placeholder="Alamat Lengkap" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-medium mb-3">Metode Pembayaran</h3>
+                    <div class="mb-4">
+                        <div class="flex items-center mb-2">
+                            <input id="payment-transfer" name="payment-method" type="radio" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" checked>
+                            <label for="payment-transfer" class="ml-2 block text-sm text-gray-900">
+                                Transfer Bank
+                            </label>
+                        </div>
+                        <div class="flex items-center mb-2">
+                            <input id="payment-credit" name="payment-method" type="radio" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                            <label for="payment-credit" class="ml-2 block text-sm text-gray-900">
+                                Kartu Kredit
+                            </label>
+                        </div>
+                        <div class="flex items-center mb-2">
+                            <input id="payment-ewallet" name="payment-method" type="radio" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                            <label for="payment-ewallet" class="ml-2 block text-sm text-gray-900">
+                                E-Wallet
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8">
+                        <button id="place-order-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline">
+                            Selesaikan Pesanan
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer (Fixed) -->
+    <footer class="footer p-6">
+        <div class="container mx-auto">
+            <div class="mb-4">
+                <h3 class="text-lg font-semibold mb-2">Alamat</h3>
+                <p>Jl. Teknologi Informasi No. 123</p>
+                <p>Jakarta Selatan, Indonesia</p>
+            </div>
+            
+            <div class="mb-4">
+                <h3 class="text-lg font-semibold mb-2">Kontak</h3>
+                <p>Telepon: +62 812 3456 7890</p>
+                <p>Email: info@ecommerce-shop.com</p>
+            </div>
+            
+            <div class="text-center text-sm text-gray-400 mt-8">
+                Powered by ksainovasi.com
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ambil data keranjang dari localStorage
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            
+            // Tampilkan item di keranjang
+            const checkoutItemsContainer = document.getElementById('checkout-items');
+            let subtotal = 0;
+            
+            if (cart.length === 0) {
+                // Jika keranjang kosong, tambahkan contoh item
+                cart = [
+                    { product: { id: 1, name: "Smartphone XYZ", price: 2500000 }, quantity: 1 },
+                    { product: { id: 3, name: "Headphone Premium", price: 1200000 }, quantity: 2 }
+                ];
+            }
+            
+            // Render item keranjang
+            cart.forEach(item => {
+                const itemTotal = item.product.price * item.quantity;
+                subtotal += itemTotal;
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="py-2 px-4 border-b border-gray-200">${item.product.name}</td>
+                    <td class="py-2 px-4 border-b border-gray-200">${formatPrice(item.product.price)}</td>
+                    <td class="py-2 px-4 border-b border-gray-200">${item.quantity}</td>
+                    <td class="py-2 px-4 border-b border-gray-200">${formatPrice(itemTotal)}</td>
+                `;
+                checkoutItemsContainer.appendChild(row);
+            });
+            
+            // Hitung dan tampilkan total
+            const tax = subtotal * 0.1;
+            const total = subtotal + tax;
+            
+            document.getElementById('subtotal').textContent = formatPrice(subtotal);
+            document.getElementById('tax').textContent = formatPrice(tax);
+            document.getElementById('total').textContent = formatPrice(total);
+            
+            // Event listener untuk tombol selesaikan pesanan - redirect ke WhatsApp
+            document.getElementById('place-order-btn').addEventListener('click', function() {
+                // Dapatkan total belanja
+                const totalBelanja = document.getElementById('total').textContent;
+                
+                // Dapatkan informasi pelanggan
+                const nama = document.getElementById('name').value || 'Pelanggan';
+                const alamat = document.getElementById('address').value || '-';
+                
+                // Buat pesan untuk WhatsApp
+                let pesan = `Halo, saya ingin melakukan pemesanan:\n\n`;
+                pesan += `Nama: ${nama}\n`;
+                pesan += `Alamat: ${alamat}\n\n`;
+                pesan += `Detail Pesanan:\n`;
+                
+                // Tambahkan item keranjang ke pesan
+                cart.forEach(item => {
+                    pesan += `- ${item.product.name} x${item.quantity}: ${formatPrice(item.product.price * item.quantity)}\n`;
+                });
+                
+                pesan += `\nTotal: ${totalBelanja}`;
+                
+                // Encode pesan untuk URL
+                const encodedPesan = encodeURIComponent(pesan);
+                
+                // Redirect ke WhatsApp
+                window.location.href = `https://wa.me/6287886425562?text=${encodedPesan}`;
+                
+                // Kosongkan keranjang
+                localStorage.removeItem('cart');
+            });
+            
+            // Format harga dalam Rupiah
+            function formatPrice(price) {
+                return new Intl.NumberFormat('id-ID', {
+                    style: 'currency',
+                    currency: 'IDR',
+                    minimumFractionDigits: 0
+                }).format(price);
+            }
+        });
+    </script>
+</body>
+</html>

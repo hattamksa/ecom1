@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Commerce Shop - Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: #f5f5f5;
+        }
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .footer {
+            background-color: #2c3e50;
+            color: white;
+        }
+        .hero-section {
+            background: linear-gradient(135deg, #4a90e2 0%, #2c3e50 100%);
+            color: white;
+            height: 500px;
+        }
+        .product-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow: auto;
+        }
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 600px;
+            animation: modalFadeIn 0.3s;
+        }
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: #e53e3e;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .cart-modal {
+            position: fixed;
+            top: 60px;
+            right: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            width: 350px;
+            z-index: 200;
+            display: none;
+        }
+        @keyframes modalFadeIn {
+            from {opacity: 0; transform: translateY(-20px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+        .close-btn:hover {
+            color: #000;
+        }
+        .btn-primary {
+            background-color: #4a90e2;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: #3a7bc8;
+        }
+        .btn-secondary {
+            background-color: #f0f0f0;
+            color: #333;
+            transition: background-color 0.3s;
+        }
+        .btn-secondary:hover {
+            background-color: #e0e0e0;
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background-color: #48bb78;
+            color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: none;
+            animation: slideIn 0.3s forwards;
+        }
+        @keyframes slideIn {
+            from {transform: translateX(100%); opacity: 0;}
+            to {transform: translateX(0); opacity: 1;}
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+    <!-- Header (Sticky) -->
+    <header class="sticky-header bg-white p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-blue-600">E-Commerce Shop</h1>
+            <div class="flex items-center space-x-4">
+                <nav class="hidden md:flex space-x-6">
+                    <a href="#home" class="hover:text-blue-600">Home</a>
+                    <a href="#products" class="hover:text-blue-600">Products</a>
+                    <a href="#categories" class="hover:text-blue-600">Categories</a>
+                    <a href="#about" class="hover:text-blue-600">About</a>
+                    <a href="contact.html" class="hover:text-blue-600">Contact</a>
+                </nav>
+                <div class="relative">
+                    <button id="cart-button" class="bg-blue-500 text-white p-2 rounded-full">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span id="cart-count" class="cart-badge">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Cart Modal -->
+    <div id="cart-modal" class="cart-modal">
+        <div class="p-4">
+            <h3 class="text-lg font-semibold mb-2">Keranjang Belanja</h3>
+            <div id="cart-items" class="max-h-60 overflow-y-auto">
+                <!-- Cart items will be inserted here -->
+                <p id="empty-cart-message" class="text-gray-500">Keranjang kosong</p>
+            </div>
+            <div class="border-t mt-4 pt-4">
+                <div class="flex justify-between font-semibold mb-4">
+                    <span>Total:</span>
+                    <span id="cart-total">Rp 0</span>
+                </div>
+                <button id="checkout-button" class="w-full bg-gray-400 text-white py-2 rounded-md cursor-not-allowed" disabled>
+                    Checkout
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-section flex items-center">
+        <div class="container mx-auto px-4 py-16">
+            <div class="max-w-2xl">
+                <h1 class="text-4xl md:text-5xl font-bold mb-4">Temukan Produk Terbaik untuk Anda</h1>
+                <p class="text-xl mb-8">Dapatkan penawaran spesial untuk berbagai produk elektronik terbaru dengan kualitas terbaik.</p>
+                <div class="flex space-x-4">
+                    <a href="#products" class="bg-white text-blue-600 px-6 py-3 rounded-md font-semibold hover:bg-blue-50 transition">Lihat Produk</a>
+                    <a href="#categories" class="bg-transparent border-2 border-white text-white px-6 py-3 rounded-md font-semibold hover:bg-white hover:text-blue-600 transition">Kategori</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Categories -->
+    <section id="categories" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-semibold mb-8 text-center">Kategori Populer</h2>
+            
+            <!-- Category Filter Buttons -->
+            <div class="flex flex-wrap justify-center gap-4 mb-10">
+                <button class="category-filter bg-blue-600 text-white px-6 py-2 rounded-full font-medium hover:bg-blue-700 transition" data-category="all">
+                    All
+                </button>
+                <button class="category-filter bg-gray-200 text-gray-800 px-6 py-2 rounded-full font-medium hover:bg-gray-300 transition" data-category="food">
+                    Food
+                </button>
+                <button class="category-filter bg-gray-200 text-gray-800 px-6 py-2 rounded-full font-medium hover:bg-gray-300 transition" data-category="elektronik">
+                    Elektronik
+                </button>
+                <button class="category-filter bg-gray-200 text-gray-800 px-6 py-2 rounded-full font-medium hover:bg-gray-300 transition" data-category="rumah-tangga">
+                    Rumah Tangga
+                </button>
+                <button class="category-filter bg-gray-200 text-gray-800 px-6 py-2 rounded-full font-medium hover:bg-gray-300 transition" data-category="kebutuhan-sehari-hari">
+                    Kebutuhan Sehari-hari
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-6">
+                <div class="bg-gray-100 p-6 rounded-lg text-center hover:bg-gray-200 transition cursor-pointer category-item" data-category="all">
+                    <div class="text-4xl text-blue-600 mb-4">
+                        <i class="fas fa-th-large"></i>
+                    </div>
+                    <h3 class="font-semibold">Semua</h3>
+                </div>
+                <div class="bg-gray-100 p-6 rounded-lg text-center hover:bg-gray-200 transition cursor-pointer category-item" data-category="food">
+                    <div class="text-4xl text-blue-600 mb-4">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <h3 class="font-semibold">Food</h3>
+                </div>
+                <div class="bg-gray-100 p-6 rounded-lg text-center hover:bg-gray-200 transition cursor-pointer category-item" data-category="elektronik">
+                    <div class="text-4xl text-blue-600 mb-4">
+                        <i class="fas fa-laptop"></i>
+                    </div>
+                    <h3 class="font-semibold">Elektronik</h3>
+                </div>
+                <div class="bg-gray-100 p-6 rounded-lg text-center hover:bg-gray-200 transition cursor-pointer category-item" data-category="rumah-tangga">
+                    <div class="text-4xl text-blue-600 mb-4">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <h3 class="font-semibold">Rumah Tangga</h3>
+                </div>
+                <div class="bg-gray-100 p-6 rounded-lg text-center hover:bg-gray-200 transition cursor-pointer category-item" data-category="kebutuhan-sehari-hari">
+                    <div class="text-4xl text-blue-600 mb-4">
+                        <i class="fas fa-shopping-basket"></i>
+                    </div>
+                    <h3 class="font-semibold">Kebutuhan Sehari-hari</h3>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section id="products" class="py-16">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-semibold mb-8 text-center">Produk Terbaru</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" id="product-container">
+                <!-- Product cards will be inserted here by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto">
+                <h2 class="text-3xl font-semibold mb-6 text-center">Tentang Kami</h2>
+                <p class="text-lg mb-6">E-Commerce Shop adalah toko online terpercaya yang menyediakan berbagai produk elektronik berkualitas tinggi. Kami berkomitmen untuk memberikan pengalaman belanja yang mudah dan menyenangkan bagi pelanggan kami.</p>
+                <p class="text-lg mb-6">Dengan layanan pelanggan yang responsif dan pengiriman cepat, kami berusaha untuk menjadi pilihan utama Anda dalam berbelanja produk elektronik secara online.</p>
+                <div class="flex justify-center mt-8">
+                    <a href="#products" class="bg-blue-600 text-white px-6 py-3 rounded-md font-semibold hover:bg-blue-700 transition">Mulai Belanja</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer p-6 mt-auto">
+        <div class="container mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Alamat</h3>
+                    <p>Jl. Teknologi Informasi No. 123</p>
+                    <p>Jakarta Selatan, Indonesia</p>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Kontak</h3>
+                    <p>Telepon: +62 812 3456 7890</p>
+                    <p>Email: info@ecommerce-shop.com</p>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Ikuti Kami</h3>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-white hover:text-blue-300"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-white hover:text-blue-300"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-white hover:text-blue-300"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-white hover:text-blue-300"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center text-sm text-gray-400 mt-8">
+                Powered by ksainovasi.com
+            </div>
+        </div>
+    </footer>
+
+    <!-- Product Detail Modal -->
+    <div id="product-modal" class="modal">
+        <div class="modal-content relative">
+            <span class="close-btn">&times;</span>
+            <div id="modal-content" class="pt-4">
+                <!-- Product detail content will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification">
+        <span id="notification-message">Produk ditambahkan ke keranjang!</span>
+    </div>
+
+    <script>
+        // Product data
+        const products = [
+            // ELEKTRONIK - 10 ITEMS
+            {
+                id: 1,
+                name: "Smartphone XYZ Pro",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 2500000,
+                description: "Smartphone dengan performa tinggi, kamera 48MP, dan baterai tahan lama. Cocok untuk kebutuhan sehari-hari dan gaming.",
+                specs: ["Layar 6.5 inch", "RAM 8GB", "Storage 128GB", "Baterai 5000mAh"],
+                category: "elektronik"
+            },
+            {
+                id: 2,
+                name: "Laptop ABC Ultra",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 8000000,
+                description: "Laptop premium dengan performa tinggi untuk kebutuhan profesional dan gaming. Desain tipis dan ringan.",
+                specs: ["Layar 15.6 inch", "RAM 16GB", "SSD 512GB", "Intel Core i7"],
+                category: "elektronik"
+            },
+            {
+                id: 3,
+                name: "Headphone Premium",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 1200000,
+                description: "Headphone dengan kualitas suara premium dan noise cancellation. Nyaman digunakan untuk waktu lama.",
+                specs: ["Wireless", "Noise Cancellation", "Battery 30 hours", "Quick Charge"],
+                category: "elektronik"
+            },
+            {
+                id: 4,
+                name: "Smart Watch Pro",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 1800000,
+                description: "Smartwatch dengan berbagai fitur kesehatan dan notifikasi. Tahan air dan baterai tahan lama.",
+                specs: ["Layar AMOLED", "Heart Rate Monitor", "GPS", "Water Resistant"],
+                category: "elektronik"
+            },
+            {
+                id: 5,
+                name: "Wireless Earbuds",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 900000,
+                description: "Earbuds wireless dengan kualitas suara jernih dan bass yang kuat. Nyaman dipakai sepanjang hari.",
+                specs: ["Bluetooth 5.0", "Touch Control", "Battery 24 hours", "IPX5 Water Resistant"],
+                category: "elektronik"
+            },
+            {
+                id: 6,
+                name: "Tablet Pro Max",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 5000000,
+                description: "Tablet dengan layar besar dan performa tinggi. Cocok untuk produktivitas dan hiburan.",
+                specs: ["Layar 11 inch", "RAM 6GB", "Storage 256GB", "Stylus Support"],
+                category: "elektronik"
+            },
+            {
+                id: 7,
+                name: "Kamera DSLR Pro",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 7500000,
+                description: "Kamera DSLR profesional dengan kualitas gambar terbaik. Cocok untuk fotografi profesional.",
+                specs: ["24.2 MP", "4K Video", "ISO 100-25600", "45-point AF"],
+                category: "elektronik"
+            },
+            {
+                id: 8,
+                name: "Speaker Bluetooth Premium",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 750000,
+                description: "Speaker bluetooth dengan suara jernih dan bass yang kuat. Tahan air dan baterai tahan lama.",
+                specs: ["Bluetooth 5.0", "Waterproof", "Battery 12 hours", "360° Sound"],
+                category: "elektronik"
+            },
+            {
+                id: 9,
+                name: "TV LED 4K 55 inch",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 6500000,
+                description: "TV LED dengan resolusi 4K Ultra HD dan Smart TV. Pengalaman menonton yang lebih immersive.",
+                specs: ["55 inch", "4K Ultra HD", "Smart TV", "HDR"],
+                category: "elektronik"
+            },
+            {
+                id: 10,
+                name: "Mesin Cuci Otomatis",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 3200000,
+                description: "Mesin cuci dengan teknologi inverter hemat energi dan berbagai program pencucian.",
+                specs: ["Kapasitas 8kg", "Inverter", "10 Program", "Hemat Energi"],
+                category: "elektronik"
+            },
+            
+            // FOOD - 10 ITEMS
+            {
+                id: 11,
+                name: "Nasi Goreng Spesial",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 25000,
+                description: "Nasi goreng dengan bumbu pilihan, telur, ayam, dan sayuran segar. Disajikan dengan kerupuk dan acar.",
+                specs: ["Porsi Besar", "Level Pedas Sesuai Selera", "Tambahan Telur", "Free Kerupuk"],
+                category: "food"
+            },
+            {
+                id: 12,
+                name: "Ayam Bakar Madu",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 35000,
+                description: "Ayam bakar dengan bumbu madu spesial yang manis dan gurih. Disajikan dengan nasi dan lalapan.",
+                specs: ["1 Potong Ayam", "Sambal Terasi", "Lalapan Segar", "Nasi Putih"],
+                category: "food"
+            },
+            {
+                id: 13,
+                name: "Sate Ayam Madura",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 30000,
+                description: "Sate ayam khas Madura dengan bumbu kacang yang kental dan lezat. Disajikan dengan lontong.",
+                specs: ["10 Tusuk", "Bumbu Kacang", "Lontong", "Bawang Merah"],
+                category: "food"
+            },
+            {
+                id: 14,
+                name: "Mie Goreng Seafood",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 28000,
+                description: "Mie goreng dengan berbagai seafood segar seperti udang, cumi, dan kerang. Disajikan dengan telur mata sapi.",
+                specs: ["Porsi Jumbo", "Seafood Segar", "Telur Mata Sapi", "Level Pedas Sesuai Selera"],
+                category: "food"
+            },
+            {
+                id: 15,
+                name: "Soto Ayam Lamongan",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 22000,
+                description: "Soto ayam khas Lamongan dengan kuah bening yang gurih dan suwiran ayam yang lembut.",
+                specs: ["Kuah Bening", "Suwiran Ayam", "Koya", "Telur Rebus"],
+                category: "food"
+            },
+            {
+                id: 16,
+                name: "Rendang Daging Sapi",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 40000,
+                description: "Rendang daging sapi khas Padang dengan bumbu rempah yang kaya dan daging yang empuk.",
+                specs: ["Daging Sapi Pilihan", "Bumbu Rempah", "Tidak Pedas", "Porsi 250gr"],
+                category: "food"
+            },
+            {
+                id: 17,
+                name: "Gado-Gado Spesial",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 20000,
+                description: "Gado-gado dengan berbagai sayuran segar, telur, tahu, tempe, dan bumbu kacang yang lezat.",
+                specs: ["Sayuran Segar", "Bumbu Kacang", "Telur Rebus", "Kerupuk Udang"],
+                category: "food"
+            },
+            {
+                id: 18,
+                name: "Bakso Malang Komplit",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 25000,
+                description: "Bakso dengan berbagai varian seperti bakso urat, bakso telur, dan tahu bakso. Disajikan dengan mie dan pangsit.",
+                specs: ["Bakso Daging Sapi", "Bakso Urat", "Tahu Bakso", "Mie Kuning"],
+                category: "food"
+            },
+            {
+                id: 19,
+                name: "Nasi Padang Komplit",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 35000,
+                description: "Nasi Padang dengan berbagai lauk seperti rendang, ayam pop, gulai nangka, dan telur balado.",
+                specs: ["Rendang", "Ayam Pop", "Gulai Nangka", "Telur Balado"],
+                category: "food"
+            },
+            {
+                id: 20,
+                name: "Es Teh Manis",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 5000,
+                description: "Es teh manis yang segar dan menyegarkan. Cocok untuk menemani hidangan utama.",
+                specs: ["Teh Pilihan", "Gula Aren", "Es Batu", "Ukuran Besar"],
+                category: "food"
+            },
+            
+            // RUMAH TANGGA - 10 ITEMS
+            {
+                id: 21,
+                name: "Set Panci Stainless 5pcs",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 450000,
+                description: "Set panci stainless steel berkualitas tinggi dengan berbagai ukuran untuk kebutuhan memasak sehari-hari.",
+                specs: ["5 Ukuran Berbeda", "Anti Karat", "Tahan Panas", "Gagang Ergonomis"],
+                category: "rumah-tangga"
+            },
+            {
+                id: 22,
+                name: "Blender Multifungsi",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 350000,
+                description: "Blender multifungsi dengan berbagai kecepatan dan pisau tajam untuk menghaluskan berbagai bahan makanan.",
+                specs: ["5 Kecepatan", "Kapasitas 1.5L", "Pisau Stainless", "Mudah Dibersihkan"],
+                category: "rumah-tangga"
+            },
+            {
+                id: 23,
+                name: "Set Pisau Dapur Premium",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 280000,
+                description: "Set pisau dapur premium dengan berbagai ukuran untuk berbagai kebutuhan memasak.",
+                specs: ["6 Pisau Berbeda", "Stainless Steel", "Gagang Ergonomis", "Dudukan Kayu"],
+                category: "rumah-tangga"
+            },
+            {
+                id: 24,
+                name: "Rice Cooker Digital",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 420000,
+                description: "Rice cooker digital dengan berbagai program memasak dan fungsi penghangat.",
+                specs: ["Kapasitas 1.8L", "10 Program", "Keep Warm", "Anti Lengket"],
+                category: "rumah-tangga"
+            },
+            {
+                id: 25,
+                name: "Setrika Uap",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 320000,
+                description: "Setrika uap dengan teknologi anti lengket dan pengaturan suhu yang presisi.",
+                specs: ["Teknologi Uap", "Anti Lengket", "Pengaturan Suhu", "Hemat Energi"],
+                category: "rumah-tangga"
+            },
+            {
+                id: 26,
+                name: "Vacuum Cleaner Portable",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 550000,
+                description: "Vacuum cleaner portable dengan daya sedot kuat dan baterai tahan lama.",
+                specs: ["Cordless", "Daya Sedot Kuat", "Baterai 45 Menit", "Mudah Dibersihkan"],
+                category: "rumah-tangga"
+            },
+            {
+                id: 27,
+                name: "Dispenser Air Panas & Dingin",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 780000,
+                description: "Dispenser air dengan fungsi panas dan dingin, serta desain yang elegan.",
+                specs: ["Air Panas & Dingin", "Hemat Energi", "Tangki Stainless", "Pengaman Anak"],
+                category: "rumah-tangga"
+            },
+            {
+                id: 28,
+                name: "Kompor Gas 2 Tungku",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 320000,
+                description: "Kompor gas 2 tungku dengan api yang stabil dan pengaman kebocoran gas.",
+                specs: ["2 Tungku", "Api Stabil", "Pengaman Gas", "Mudah Dibersihkan"],
+                category: "rumah-tangga"
+            },
+            {
+                id: 29,
+                name: "Rak Piring Stainless",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 180000,
+                description: "Rak piring stainless yang kokoh dan anti karat untuk menyimpan dan mengeringkan piring.",
+                specs: ["2 Tingkat", "Anti Karat", "Kokoh", "Nampan Air"],
+                category: "rumah-tangga"
+            },
+            {
+                id: 30,
+                name: "Teko Listrik",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 150000,
+                description: "Teko listrik dengan pemanas cepat dan pengaman panas berlebih.",
+                specs: ["Kapasitas 1.8L", "Pemanas Cepat", "Auto Off", "Indikator LED"],
+                category: "rumah-tangga"
+            },
+            
+            // KEBUTUHAN SEHARI-HARI - 10 ITEMS
+            {
+                id: 31,
+                name: "Sabun Cuci Piring Lemon",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 15000,
+                description: "Sabun cuci piring dengan formula anti lemak dan wangi lemon yang menyegarkan.",
+                specs: ["Isi 800ml", "Anti Lemak", "Wangi Lemon", "Lembut di Tangan"],
+                category: "kebutuhan-sehari-hari"
+            },
+            {
+                id: 32,
+                name: "Pasta Gigi Keluarga",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 18000,
+                description: "Pasta gigi untuk seluruh keluarga dengan formula perlindungan gigi dan penyegar nafas.",
+                specs: ["Isi 225g", "Anti Plak", "Penyegar Nafas", "Perlindungan Gigi Berlubang"],
+                category: "kebutuhan-sehari-hari"
+            },
+            {
+                id: 33,
+                name: "Deterjen Bubuk",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 25000,
+                description: "Deterjen bubuk dengan formula pembersih noda membandel dan wangi tahan lama.",
+                specs: ["Isi 1kg", "Anti Noda", "Wangi Tahan Lama", "Cocok Semua Mesin Cuci"],
+                category: "kebutuhan-sehari-hari"
+            },
+            {
+                id: 34,
+                name: "Sampo Anti Ketombe",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 22000,
+                description: "Sampo anti ketombe dengan formula yang lembut dan wangi segar.",
+                specs: ["Isi 340ml", "Anti Ketombe", "Wangi Segar", "Untuk Semua Jenis Rambut"],
+                category: "kebutuhan-sehari-hari"
+            },
+            {
+                id: 35,
+                name: "Sabun Mandi Cair",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 20000,
+                description: "Sabun mandi cair dengan formula pelembab dan wangi yang tahan lama.",
+                specs: ["Isi 450ml", "Pelembab", "Wangi Tahan Lama", "pH Seimbang"],
+                category: "kebutuhan-sehari-hari"
+            },
+            {
+                id: 36,
+                name: "Tisu Facial",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 12000,
+                description: "Tisu facial lembut dengan 2 lapis untuk penggunaan sehari-hari.",
+                specs: ["200 Lembar", "2 Lapis", "Lembut", "Tidak Mudah Sobek"],
+                category: "kebutuhan-sehari-hari"
+            },
+            {
+                id: 37,
+                name: "Sikat Gigi Medium",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 8000,
+                description: "Sikat gigi dengan bulu medium dan gagang ergonomis untuk pembersihan optimal.",
+                specs: ["Bulu Medium", "Gagang Ergonomis", "Pembersih Lidah", "Anti Slip"],
+                category: "kebutuhan-sehari-hari"
+            },
+            {
+                id: 38,
+                name: "Pembersih Lantai",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 18000,
+                description: "Pembersih lantai dengan formula anti bakteri dan wangi segar tahan lama.",
+                specs: ["Isi 800ml", "Anti Bakteri", "Wangi Segar", "Aman untuk Semua Lantai"],
+                category: "kebutuhan-sehari-hari"
+            },
+            {
+                id: 39,
+                name: "Pewangi Pakaian",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 15000,
+                description: "Pewangi pakaian dengan wangi premium yang tahan lama dan formula anti bakteri.",
+                specs: ["Isi 600ml", "Wangi Premium", "Anti Bakteri", "Aman untuk Semua Jenis Kain"],
+                category: "kebutuhan-sehari-hari"
+            },
+            {
+                id: 40,
+                name: "Handuk Mandi",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA-12pws_V_freejeI_CTBX4MPmCPbC2_uuQ&s",
+                price: 45000,
+                description: "Handuk mandi dengan bahan lembut dan daya serap tinggi. Nyaman digunakan sehari-hari.",
+                specs: ["Ukuran 70x140cm", "Daya Serap Tinggi", "Lembut", "Anti Bakteri"],
+                category: "kebutuhan-sehari-hari"
+            }
+        ];
+
+        // Cart data
+        let cart = [];
+
+        // Format price in Rupiah
+        function formatPrice(price) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0
+            }).format(price);
+        }
+
+        // Category filtering
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event listeners to category filter buttons
+            const categoryFilters = document.querySelectorAll('.category-filter');
+            categoryFilters.forEach(button => {
+                button.addEventListener('click', function() {
+                    const category = this.getAttribute('data-category');
+                    
+                    // Update active button styling
+                    categoryFilters.forEach(btn => {
+                        btn.classList.remove('bg-blue-600', 'text-white');
+                        btn.classList.add('bg-gray-200', 'text-gray-800');
+                    });
+                    this.classList.remove('bg-gray-200', 'text-gray-800');
+                    this.classList.add('bg-blue-600', 'text-white');
+                    
+                    // Filter products
+                    filterProducts(category);
+                });
+            });
+            
+            // Initial render of all products
+            renderProducts(products);
+        });
+        
+        // Filter products by category
+        function filterProducts(category) {
+            const productContainer = document.getElementById('product-container');
+            productContainer.innerHTML = '';
+            
+            if (category === 'all') {
+                // Group products by category
+                const categories = ['elektronik', 'food', 'rumah-tangga', 'kebutuhan-sehari-hari'];
+                
+                categories.forEach(cat => {
+                    const categoryProducts = products.filter(product => product.category === cat);
+                    if (categoryProducts.length > 0) {
+                        renderCategorySection(cat, categoryProducts);
+                    }
+                });
+            } else {
+                // Show only products from selected category
+                const filteredProducts = products.filter(product => product.category === category);
+                if (filteredProducts.length > 0) {
+                    renderCategorySection(category, filteredProducts);
+                }
+            }
+        }
+        
+        // Render category section with title
+        function renderCategorySection(category, categoryProducts) {
+            const productContainer = document.getElementById('product-container');
+            
+            // Create category title
+            const categoryTitle = document.createElement('div');
+            categoryTitle.className = 'w-full mb-6';
+            
+            let categoryName = '';
+            switch(category) {
+                case 'elektronik':
+                    categoryName = 'Elektronik';
+                    break;
+                case 'food':
+                    categoryName = 'Makanan';
+                    break;
+                case 'rumah-tangga':
+                    categoryName = 'Rumah Tangga';
+                    break;
+                case 'kebutuhan-sehari-hari':
+                    categoryName = 'Kebutuhan Sehari-hari';
+                    break;
+                default:
+                    categoryName = 'Produk Lainnya';
+            }
+            
+            categoryTitle.innerHTML = `
+                <h3 class="text-2xl font-semibold mb-4 border-b pb-2">${categoryName}</h3>
+            `;
+            productContainer.appendChild(categoryTitle);
+            
+            // Create product grid for this category
+            const productGrid = document.createElement('div');
+            productGrid.className = 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-10';
+            
+            // Add products to grid
+            categoryProducts.forEach(product => {
+                const productCard = createProductCard(product);
+                productGrid.appendChild(productCard);
+            });
+            
+            productContainer.appendChild(productGrid);
+        }
+        
+        // Create product card element
+        function createProductCard(product) {
+            const productCard = document.createElement('div');
+            productCard.className = 'bg-white rounded-lg shadow-md overflow-hidden product-card';
+            productCard.innerHTML = `
+                <div class="p-4">
+                    <img src="${product.image}" alt="${product.name}" class="w-full h-48 object-contain mb-4">
+                    <h3 class="text-lg font-semibold mb-2">${product.name}</h3>
+                    <p class="text-blue-600 font-bold mb-4">${formatPrice(product.price)}</p>
+                    <div class="flex space-x-2">
+                        <button class="add-to-cart-btn flex-1 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition" data-id="${product.id}">
+                            Add to Cart
+                        </button>
+                        <button class="view-detail-btn flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded hover:bg-gray-300 transition" data-id="${product.id}">
+                            View Detail
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            return productCard;
+        }
+        
+        // Render products (legacy function, now just calls filterProducts)
+        function renderProducts() {
+                const productCard = document.createElement('div');
+                productCard.className = 'bg-white rounded-lg shadow-md overflow-hidden product-card';
+                productCard.innerHTML = `
+                    <img src="${product.image}" alt="${product.name}" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-lg font-semibold mb-2">${product.name}</h3>
+                        <p class="text-gray-700 mb-4">${formatPrice(product.price)}</p>
+                        <div class="flex space-x-2">
+                            <button class="add-to-cart-btn flex-1 bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition btn-primary" data-id="${product.id}">
+                                Add to Cart
+                            </button>
+                            <button class="view-detail-btn flex-1 bg-gray-200 text-gray-800 py-2 rounded-md hover:bg-gray-300 transition btn-secondary" data-id="${product.id}">
+                                View Detail
+                            </button>
+                        </div>
+                    </div>
+                `;
+                productContainer.appendChild(productCard);
+            });
+
+            // Add event listeners to buttons
+            document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const productId = parseInt(this.getAttribute('data-id'));
+                    addToCart(productId);
+                });
+            });
+
+            document.querySelectorAll('.view-detail-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const productId = parseInt(this.getAttribute('data-id'));
+                    showProductDetail(productId);
+                });
+            });
+        }
+
+        // Show product detail modal
+        function showProductDetail(productId) {
+            const product = products.find(p => p.id === productId);
+            const modal = document.getElementById('product-modal');
+            const modalContent = document.getElementById('modal-content');
+
+            modalContent.innerHTML = `
+                <div class="flex flex-col md:flex-row">
+                    <div class="md:w-1/2 p-4">
+                        <img src="${product.image}" alt="${product.name}" class="w-full h-auto object-cover rounded-lg">
+                    </div>
+                    <div class="md:w-1/2 p-4">
+                        <h2 class="text-2xl font-bold mb-2">${product.name}</h2>
+                        <p class="text-blue-600 text-xl font-semibold mb-4">${formatPrice(product.price)}</p>
+                        <p class="text-gray-700 mb-4">${product.description}</p>
+                        <div class="mb-4">
+                            <h3 class="font-semibold mb-2">Spesifikasi:</h3>
+                            <ul class="list-disc pl-5">
+                                ${product.specs.map(spec => `<li>${spec}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <button class="add-to-cart-modal-btn w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition" data-id="${product.id}">
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            modal.style.display = 'block';
+
+            // Add event listener to Add to Cart button in modal
+            document.querySelector('.add-to-cart-modal-btn').addEventListener('click', function() {
+                const productId = parseInt(this.getAttribute('data-id'));
+                addToCart(productId);
+                modal.style.display = 'none';
+            });
+
+            // Close modal when clicking on X
+            document.querySelector('.close-btn').addEventListener('click', function() {
+                modal.style.display = 'none';
+            });
+
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        }
+
+        // Add product to cart
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            const existingItem = cart.find(item => item.product.id === productId);
+
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    product: product,
+                    quantity: 1
+                });
+            }
+
+            // Save cart to localStorage
+            localStorage.setItem('cart', JSON.stringify(cart));
+
+            // Update cart UI
+            updateCartUI();
+
+            // Show notification
+            showNotification(`${product.name} ditambahkan ke keranjang!`);
+        }
+
+        // Update cart UI
+        function updateCartUI() {
+            const cartCount = document.getElementById('cart-count');
+            const cartItems = document.getElementById('cart-items');
+            const cartTotal = document.getElementById('cart-total');
+            const emptyCartMessage = document.getElementById('empty-cart-message');
+
+            // Update cart count
+            const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
+            cartCount.textContent = totalItems;
+
+            // Update cart items
+            if (cart.length === 0) {
+                emptyCartMessage.style.display = 'block';
+                cartItems.innerHTML = '';
+                cartItems.appendChild(emptyCartMessage);
+            } else {
+                emptyCartMessage.style.display = 'none';
+                cartItems.innerHTML = '';
+
+                cart.forEach(item => {
+                    const cartItem = document.createElement('div');
+                    cartItem.className = 'flex justify-between items-center py-2 border-b';
+                    cartItem.innerHTML = `
+                        <div>
+                            <div class="font-medium">${item.product.name}</div>
+                            <div class="text-sm text-gray-500">${formatPrice(item.product.price)} x ${item.quantity}</div>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="font-medium">${formatPrice(item.product.price * item.quantity)}</span>
+                            <button class="remove-item-btn ml-2 text-red-500 hover:text-red-700" data-id="${item.product.id}">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    `;
+                    cartItems.appendChild(cartItem);
+                });
+
+                // Add event listeners to remove buttons
+                document.querySelectorAll('.remove-item-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const productId = parseInt(this.getAttribute('data-id'));
+                        removeFromCart(productId);
+                    });
+                });
+            }
+
+            // Update cart total
+            const total = cart.reduce((total, item) => total + (item.product.price * item.quantity), 0);
+            cartTotal.textContent = formatPrice(total);
+        }
+
+        // Remove item from cart
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.product.id !== productId);
+            
+            // Save cart to localStorage
+            localStorage.setItem('cart', JSON.stringify(cart));
+            
+            // Update cart UI
+            updateCartUI();
+        }
+
+        // Show notification
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            const notificationMessage = document.getElementById('notification-message');
+            
+            notificationMessage.textContent = message;
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        // Toggle cart modal
+        document.getElementById('cart-button').addEventListener('click', function() {
+            const cartModal = document.getElementById('cart-modal');
+            if (cartModal.style.display === 'block') {
+                cartModal.style.display = 'none';
+            } else {
+                cartModal.style.display = 'block';
+            }
+        });
+
+        // Close cart modal when clicking outside
+        document.addEventListener('click', function(event) {
+            const cartModal = document.getElementById('cart-modal');
+            const cartButton = document.getElementById('cart-button');
+            
+            if (!cartModal.contains(event.target) && event.target !== cartButton && !cartButton.contains(event.target)) {
+                cartModal.style.display = 'none';
+            }
+        });
+
+        // Checkout button
+        document.getElementById('checkout-button').addEventListener('click', function() {
+            if (cart.length === 0) {
+                showNotification('Keranjang belanja kosong!');
+                return;
+            }
+            
+            window.location.href = 'checkout.html';
+        });
+
+        // Load cart from localStorage on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            const savedCart = localStorage.getItem('cart');
+            if (savedCart) {
+                cart = JSON.parse(savedCart);
+                updateCartUI();
+            }
+            
+            // Render products
+            renderProducts();
+        });
+    </script>
+</body>
+</html>

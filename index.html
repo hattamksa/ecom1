@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Commerce Shop - Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .hero-section {
+            background: linear-gradient(135deg, #3a7bd5, #3a6073);
+            color: white;
+            min-height: 500px;
+        }
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: #e53e3e;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .cart-modal {
+            position: fixed;
+            top: 60px;
+            right: 0;
+            width: 320px;
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 100;
+            display: none;
+        }
+        .product-card {
+            transition: transform 0.3s;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+        .product-detail-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s;
+        }
+        .product-detail-content {
+            background-color: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 24px;
+            position: relative;
+        }
+        .close-modal {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background-color: #4299e1;
+            transition: background-color 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: #3a7bc8;
+        }
+        .btn-secondary {
+            background-color: #f0f0f0;
+            color: #333;
+            transition: background-color 0.3s;
+        }
+        .btn-secondary:hover {
+            background-color: #e0e0e0;
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background-color: #48bb78;
+            color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: none;
+            animation: slideIn 0.3s forwards;
+        }
+        @keyframes slideIn {
+            from {transform: translateX(100%); opacity: 0;}
+            to {transform: translateX(0); opacity: 1;}
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+    <!-- Header (Sticky) -->
+    <header class="sticky-header bg-white p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-blue-600">E-Commerce Shop</h1>
+            <div class="flex items-center space-x-4">
+                <nav class="hidden md:flex space-x-6">
+                    <a href="#home" class="hover:text-blue-600">Home</a>
+                    <a href="#products" class="hover:text-blue-600">Products</a>
+                    <a href="#categories" class="hover:text-blue-600">Categories</a>
+                    <a href="#about" class="hover:text-blue-600">About</a>
+                    <a href="contact.html" class="hover:text-blue-600">Contact</a>
+                </nav>
+                <div class="relative">
+                    <button id="cart-button" class="bg-blue-500 text-white p-2 rounded-full">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span id="cart-count" class="cart-badge">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Cart Modal -->
+    <div id="cart-modal" class="cart-modal">
+        <div class="p-4">
+            <h3 class="text-lg font-semibold mb-2">Keranjang Belanja</h3>
+            <div id="cart-items" class="max-h-60 overflow-y-auto">
+                <!-- Cart items will be inserted here -->
+                <p id="empty-cart-message" class="text-gray-500">Keranjang kosong</p>
+            </div>
+            <div class="border-t mt-4 pt-4">
+                <div class="flex justify-between font-semibold mb-4">
+                    <span>Total:</span>
+                    <span id="cart-total">Rp 0</span>
+                </div>
+                <button id="checkout-button" class="w-full bg-gray-400 text-white py-2 rounded-md cursor-not-allowed" disabled>
+                    Checkout
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-section flex items-center">
+        <div class="container mx-auto px-4 py-16">
+            <div class="max-w-2xl">
+                <h1 class="text-4xl md:text-5xl font-bold mb-4">Temukan Produk Terbaik untuk Anda</h1>
+                <p class="text-xl mb-8">Dapatkan penawaran spesial untuk berbagai produk elektronik terbaru dengan kualitas terbaik.</p>
+                <div class="flex space-x-4">
+                    <a href="#products" class="bg-white text-blue-600 px-6 py-3 rounded-md font-semibold hover:bg-blue-50 transition">Lihat Produk</a>
+                    <a href="#categories" class="bg-transparent border-2 border-white text-white px-6 py-3 rounded-md font-semibold hover:bg-white hover:text-blue-600 transition">Kategori</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Categories -->
+    <section id="categories" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-semibold mb-8 text-center">Kategori Populer</h2>
+            
+            <!-- Category Filter Buttons -->
+            <div class="flex flex-wrap justify-center gap-4 mb-10">
+                <button class="category-filter bg-blue-600 text-white px-6 py-2 rounded-full font-medium hover:bg-blue-700 transition" data-category="all">
+                    All
+                </button>
+                <button class="category-filter bg-gray-200 text-gray-800 px-6 py-2 rounded-full font-medium hover:bg-gray-300 transition" data-category="food">
+                    Food
+                </button>
+                <button class="category-filter bg-gray-200 text-gray-800 px-6 py-2 rounded-full font-medium hover:bg-gray-300 transition" data-category="elektronik">
+                    Elektronik
+                </button>
+                <button class="category-filter bg-gray-200 text-gray-800 px-6 py-2 rounded-full font-medium hover:bg-gray-300 transition" data-category="rumah-tangga">
+                    Rumah Tangga
+                </button>
+                <button class="category-filter bg-gray-200 text-gray-800 px-6 py-2 rounded-full font-medium hover:bg-gray-300 transition" data-category="kebutuhan-sehari-hari">
+                    Kebutuhan Sehari-hari
+                </button>
+            </div>
+            
+            <!-- Category Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div class="bg-gray-100 p-6 rounded-lg text-center hover:shadow-md transition">
+                    <div class="bg-blue-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-mobile-alt text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="font-semibold">Elektronik</h3>
+                </div>
+                <div class="bg-gray-100 p-6 rounded-lg text-center hover:shadow-md transition">
+                    <div class="bg-green-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-utensils text-green-600 text-2xl"></i>
+                    </div>
+                    <h3 class="font-semibold">Food</h3>
+                </div>
+                <div class="bg-gray-100 p-6 rounded-lg text-center hover:shadow-md transition">
+                    <div class="bg-yellow-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-home text-yellow-600 text-2xl"></i>
+                    </div>
+                    <h3 class="font-semibold">Rumah Tangga</h3>
+                </div>
+                <div class="bg-gray-100 p-6 rounded-lg text-center hover:shadow-md transition">
+                    <div class="bg-purple-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-shopping-basket text-purple-600 text-2xl"></i>
+                    </div>
+                    <h3 class="font-semibold">Kebutuhan Sehari-hari</h3>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section id="products" class="py-16 bg-gray-100">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-semibold mb-8 text-center">Produk Terbaru</h2>
+            
+            <!-- Product Container -->
+            <div id="product-container" class="grid grid-cols-1 gap-6">
+                <!-- Products will be inserted here by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto">
+                <h2 class="text-3xl font-semibold mb-6 text-center">Tentang Kami</h2>
+                <p class="text-lg mb-6">E-Commerce Shop adalah toko online terpercaya yang menyediakan berbagai produk elektronik berkualitas tinggi. Kami berkomitmen untuk memberikan pengalaman belanja yang mudah dan menyenangkan bagi pelanggan kami.</p>
+                <p class="text-lg mb-8">Dengan layanan pelanggan yang responsif dan pengiriman cepat, kami berusaha untuk menjadi pilihan utama Anda dalam berbelanja produk elektronik secara online.</p>
+                <div class="text-center">
+                    <a href="#products" class="bg-blue-600 text-white px-8 py-3 rounded-md font-semibold hover:bg-blue-700 transition">Mulai Belanja</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-10 mt-auto">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-xl font-semibold mb-4">Alamat</h3>
+                    <p class="mb-2">Jl. Teknologi Informasi No. 123</p>
+                    <p>Jakarta Selatan, Indonesia</p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold mb-4">Kontak</h3>
+                    <p class="mb-2">Telepon: +62 812 3456 7890</p>
+                    <p>Email: info@ecommerce-shop.com</p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold mb-4">Ikuti Kami</h3>
+                    <div class="flex space-x-4">
+                        <a href="#" class="bg-blue-600 w-10 h-10 rounded-full flex items-center justify-center hover:bg-blue-700 transition">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="bg-blue-400 w-10 h-10 rounded-full flex items-center justify-center hover:bg-blue-500 transition">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="bg-pink-600 w-10 h-10 rounded-full flex items-center justify-center hover:bg-pink-700 transition">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="bg-blue-800 w-10 h-10 rounded-full flex items-center justify-center hover:bg-blue-900 transition">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-6 text-center">
+                <p>Powered by ksainovasi.com</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Product Detail Modal -->
+    <div id="product-detail-modal" class="product-detail-modal">
+        <div class="product-detail-content">
+            <span class="close-modal">&times;</span>
+            <div id="product-detail-content">
+                <!-- Product detail will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification">
+        <span id="notification-message">Produk ditambahkan ke keranjang!</span>
+    </div>
+
+    <script src="products.js"></script>
+    <script>
+        // Format price to IDR currency
+        function formatPrice(price) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0
+            }).format(price);
+        }
+
+        // Category filtering
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event listeners to category filter buttons
+            const categoryFilters = document.querySelectorAll('.category-filter');
+            categoryFilters.forEach(button => {
+                button.addEventListener('click', function() {
+                    const category = this.getAttribute('data-category');
+                    
+                    // Update active button styling
+                    categoryFilters.forEach(btn => {
+                        btn.classList.remove('bg-blue-600', 'text-white');
+                        btn.classList.add('bg-gray-200', 'text-gray-800');
+                    });
+                    this.classList.remove('bg-gray-200', 'text-gray-800');
+                    this.classList.add('bg-blue-600', 'text-white');
+                    
+                    // Filter products
+                    filterProducts(category);
+                });
+            });
+            
+            // Initial render of all products
+            filterProducts('all');
+        });
+        
+        // Filter products by category
+        function filterProducts(category) {
+            const productContainer = document.getElementById('product-container');
+            productContainer.innerHTML = '';
+            
+            if (category === 'all') {
+                // Group products by category
+                const categories = ['elektronik', 'food', 'rumah-tangga', 'kebutuhan-sehari-hari'];
+                
+                categories.forEach(cat => {
+                    const categoryProducts = products.filter(product => product.category === cat);
+                    if (categoryProducts.length > 0) {
+                        renderCategorySection(cat, categoryProducts);
+                    }
+                });
+            } else {
+                // Show only products from selected category
+                const filteredProducts = products.filter(product => product.category === category);
+                if (filteredProducts.length > 0) {
+                    renderCategorySection(category, filteredProducts);
+                }
+            }
+        }
+        
+        // Render category section with title
+        function renderCategorySection(category, categoryProducts) {
+            const productContainer = document.getElementById('product-container');
+            
+            // Create category title
+            const categoryTitle = document.createElement('div');
+            categoryTitle.className = 'w-full mb-6';
+            
+            let categoryName = '';
+            switch(category) {
+                case 'elektronik':
+                    categoryName = 'Elektronik';
+                    break;
+                case 'food':
+                    categoryName = 'Makanan';
+                    break;
+                case 'rumah-tangga':
+                    categoryName = 'Rumah Tangga';
+                    break;
+                case 'kebutuhan-sehari-hari':
+                    categoryName = 'Kebutuhan Sehari-hari';
+                    break;
+                default:
+                    categoryName = 'Produk Lainnya';
+            }
+            
+            categoryTitle.innerHTML = `
+                <h3 class="text-2xl font-semibold mb-4 border-b pb-2">${categoryName}</h3>
+            `;
+            productContainer.appendChild(categoryTitle);
+            
+            // Create product grid for this category
+            const productGrid = document.createElement('div');
+            productGrid.className = 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-10';
+            
+            // Add products to grid
+            categoryProducts.forEach(product => {
+                const productCard = createProductCard(product);
+                productGrid.appendChild(productCard);
+            });
+            
+            productContainer.appendChild(productGrid);
+        }
+        
+        // Create product card element
+        function createProductCard(product) {
+            const productCard = document.createElement('div');
+            productCard.className = 'bg-white rounded-lg shadow-md overflow-hidden product-card';
+            productCard.innerHTML = `
+                <div class="p-4">
+                    <img src="${product.image}" alt="${product.name}" class="w-full h-48 object-contain mb-4">
+                    <h3 class="text-lg font-semibold mb-2">${product.name}</h3>
+                    <p class="text-blue-600 font-bold mb-4">${formatPrice(product.price)}</p>
+                    <div class="flex space-x-2">
+                        <button class="add-to-cart-btn flex-1 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition" data-id="${product.id}">
+                            Add to Cart
+                        </button>
+                        <button class="view-detail-btn flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded hover:bg-gray-300 transition" data-id="${product.id}">
+                            View Detail
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            // Add event listeners
+            const addToCartBtn = productCard.querySelector('.add-to-cart-btn');
+            addToCartBtn.addEventListener('click', function() {
+                addToCart(product);
+                showNotification(`${product.name} ditambahkan ke keranjang!`);
+            });
+            
+            const viewDetailBtn = productCard.querySelector('.view-detail-btn');
+            viewDetailBtn.addEventListener('click', function() {
+                showProductDetail(product);
+            });
+            
+            return productCard;
+        }
+        
+        // Cart functionality
+        let cart = [];
+        
+        // Load cart from localStorage
+        function loadCart() {
+            const savedCart = localStorage.getItem('cart');
+            if (savedCart) {
+                cart = JSON.parse(savedCart);
+                updateCartCount();
+                updateCartDisplay();
+            }
+        }
+        
+        // Save cart to localStorage
+        function saveCart() {
+            localStorage.setItem('cart', JSON.stringify(cart));
+        }
+        
+        // Add product to cart
+        function addToCart(product) {
+            const existingItem = cart.find(item => item.id === product.id);
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    image: product.image,
+                    quantity: 1
+                });
+            }
+            
+            updateCartCount();
+            updateCartDisplay();
+            saveCart();
+        }
+        
+        // Update cart count badge
+        function updateCartCount() {
+            const cartCount = document.getElementById('cart-count');
+            const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
+            cartCount.textContent = totalItems;
+            
+            // Enable/disable checkout button
+            const checkoutButton = document.getElementById('checkout-button');
+            if (totalItems > 0) {
+                checkoutButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                checkoutButton.classList.add('bg-green-500', 'hover:bg-green-600');
+                checkoutButton.disabled = false;
+            } else {
+                checkoutButton.classList.remove('bg-green-500', 'hover:bg-green-600');
+                checkoutButton.classList.add('bg-gray-400', 'cursor-not-allowed');
+                checkoutButton.disabled = true;
+            }
+        }
+        
+        // Update cart display
+        function updateCartDisplay() {
+            const cartItems = document.getElementById("cart-items");
+            const emptyCartMessage = document.getElementById("empty-cart-message");
+            const cartTotal = document.getElementById("cart-total");
+
+            // Only proceed if all required elements exist
+            if (!cartItems || !emptyCartMessage || !cartTotal) {
+                // console.warn("Cart display elements not found on this page.");
+                return; // Exit if elements are not found (e.g., on checkout or contact page)
+            }
+
+            if (cart.length === 0) {
+                emptyCartMessage.style.display = "block";
+                cartItems.innerHTML = "";
+                cartTotal.textContent = formatPrice(0);
+                return;
+            }
+
+            emptyCartMessage.style.display = "none";
+
+            let cartHTML = "";
+            let totalPrice = 0;
+
+            cart.forEach((item) => {
+                const itemTotal = item.price * item.quantity;
+                totalPrice += itemTotal;
+
+                cartHTML += `
+                    <div class="flex items-center py-2 border-b">
+                        <img src="${item.image}" alt="${item.name}" class="w-12 h-12 object-cover mr-4">
+                        <div class="flex-1">
+                            <h4 class="text-sm font-medium">${item.name}</h4>
+                            <div class="flex items-center justify-between mt-1">
+                                <div class="text-sm text-gray-600">${formatPrice(item.price)} x ${item.quantity}</div>
+                                <div class="text-sm font-semibold">${formatPrice(itemTotal)}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            cartItems.innerHTML = cartHTML;
+            cartTotal.textContent = formatPrice(totalPrice);
+        }       
+        // Show product detail
+        function showProductDetail(product) {
+            const modal = document.getElementById('product-detail-modal');
+            const content = document.getElementById('product-detail-content');
+            
+            // Create specs list
+            let specsList = '';
+            if (product.specs && product.specs.length > 0) {
+                specsList = '<ul class="list-disc pl-5 mt-2">';
+                product.specs.forEach(spec => {
+                    specsList += `<li>${spec}</li>`;
+                });
+                specsList += '</ul>';
+            }
+            
+            content.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <img src="${product.image}" alt="${product.name}" class="w-full h-auto object-contain rounded-lg">
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold mb-2">${product.name}</h2>
+                        <p class="text-blue-600 text-xl font-bold mb-4">${formatPrice(product.price)}</p>
+                        <div class="mb-4">
+                            <h3 class="font-semibold mb-2">Deskripsi:</h3>
+                            <p>${product.description}</p>
+                        </div>
+                        <div class="mb-6">
+                            <h3 class="font-semibold mb-2">Spesifikasi:</h3>
+                            ${specsList}
+                        </div>
+                        <button class="add-to-cart-detail-btn bg-blue-500 text-white py-2 px-6 rounded-md hover:bg-blue-600 transition">
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            // Add event listener to Add to Cart button in detail view
+            const addToCartDetailBtn = content.querySelector('.add-to-cart-detail-btn');
+            addToCartDetailBtn.addEventListener('click', function() {
+                addToCart(product);
+                showNotification(`${product.name} ditambahkan ke keranjang!`);
+            });
+            
+            // Show modal
+            modal.style.opacity = '1';
+            modal.style.visibility = 'visible';
+            
+            // Close modal when clicking on X
+            const closeModal = document.querySelector('.close-modal');
+            closeModal.addEventListener('click', function() {
+                modal.style.opacity = '0';
+                modal.style.visibility = 'hidden';
+            });
+            
+            // Close modal when clicking outside
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.style.opacity = '0';
+                    modal.style.visibility = 'hidden';
+                }
+            });
+        }
+        
+        // Show notification
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            const notificationMessage = document.getElementById('notification-message');
+            
+            notificationMessage.textContent = message;
+            notification.style.display = 'block';
+            
+            // Hide notification after 3 seconds
+            setTimeout(function() {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Toggle cart modal
+        document.getElementById('cart-button').addEventListener('click', function() {
+            const cartModal = document.getElementById('cart-modal');
+            cartModal.style.display = cartModal.style.display === 'block' ? 'none' : 'block';
+        });
+        
+        // Add event listener for checkout button
+        document.getElementById('checkout-button').addEventListener('click', function() {
+            if (!this.disabled) {
+                window.location.href = 'checkout.html';
+            }
+        });
+        
+        // Close cart modal when clicking outside
+        document.addEventListener('click', function(e) {
+            const cartButton = document.getElementById('cart-button');
+            const cartModal = document.getElementById('cart-modal');
+            
+            if (!cartButton.contains(e.target) && !cartModal.contains(e.target)) {
+                cartModal.style.display = 'none';
+            }
+        });
+        
+        // Load cart on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCart();
+        });
+    </script>
+</body>
+</html>
